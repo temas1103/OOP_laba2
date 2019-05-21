@@ -1,101 +1,118 @@
-﻿using FootballLibrary;
 using System.Collections.Generic;
+using SportLibrary;
 
 namespace WindowsFormsApp1
 {
     public class Control
     {
-        /* public IFootball CurrObject
-         {
-             get { return _currObject; }
-             set { _currObject = value; }
-         }*/
-        public IFootball CurrObject { get; set; }
+        public ISportFactory[] SportFactories { get; set; }
 
-        public IFootballFactory[] FootballFactories { get; set; }
-
-        public List<IFootball> ApplicationObjects { get; set; }
+        public List<ISport> ApplicationObjects { get; set; }
 
         public Reflection Reflection { get; set; }
 
-        public object CompositionObject { get; set; }
+        public FormMain FormMain { get; set; }
 
-
-        public Control()
+        public Control(FormMain formMain)
         {
-            FootballFactories = new IFootballFactory[] {
-                new HumanFootballFactory(),
-                new SportsmanFootballFactory(),
-                new FootballPlayerFootballFactory(),
-                new FootballTeamFootballFactory()
+            SportFactories = new ISportFactory[] {
+                new SportFactory(),
+                new FunClubFactory(),
+                new SportsmanFactory(),
+                new FootballPlayerFactory(),
+                new FootballTeamFactory()
             };
-            ApplicationObjects = new List<IFootball>();
+            ApplicationObjects = new List<ISport>();
             Reflection = new Reflection();
+            FormMain = formMain;
         }
 
-        public void CreateObject(int footballFactoryIndex)
+        public ISport CreateObject(int sportFactoryIndex)
         {
-            IFootballFactory footballFactory = FootballFactories[footballFactoryIndex];
-            CurrObject = footballFactory.GetFootball();
+            ISportFactory sportFactory = SportFactories[sportFactoryIndex];
+            return sportFactory.GetSport();
         }
 
-        public void AddObject(IFootball obj)
+        public void AddObject(ISport sportObject)
         {
-            ApplicationObjects.Add(obj);
+            ApplicationObjects.Add(sportObject);
+            FormMain.AddObjectToListBox(sportObject);
         }
 
-        public void RemoveObject(IFootball obj)
+        public void RemoveObject(ISport sportObject)
         {
-            ApplicationObjects.Remove(obj);
-            obj.Remove(ref obj);
+            ApplicationObjects.Remove(sportObject);
+            sportObject.Remove(ref sportObject);
         }
 
         public void CreateStartObjects()
         {
-            Human human = new Human();
-            human.FirstName = "Артем";
-            human.LastName = "Будник";
-            human.Parametres.Age = 19;
-            human.Parametres.Height = 176;
-            human.Parametres.Weight = 60;
-            AddObject(human);
+            Sport sportBiathlon = new Sport();
+            sportBiathlon.Name = "Биатлон";
+            sportBiathlon.IsTeamOrIndividual = TeamOrIndividual.Individual;
+            sportBiathlon.IsSummerOrWinter = SummerOrWinter.Winter;
+            sportBiathlon.IsOlimpicOrNonOlimpic = OlimpicOrNonOlimpic.Olimpic;
+            ApplicationObjects.Add(sportBiathlon);
+
+            FunClub funClubDasha = new FunClub();
+            funClubDasha.Name = "Фаны Даши";
+            funClubDasha.NumberOfMembers = 5000;
+            funClubDasha.Slogan = "Вперед Беларусь!";
+            ApplicationObjects.Add(funClubDasha);
+
 
             Sportsman sportsman = new Sportsman();
             sportsman.FirstName = "Дарья";
             sportsman.LastName = "Домрачева";
             sportsman.Country = "Беларусь";
-            sportsman.Sport = "Биатлон";
+            sportsman.Sport = sportBiathlon;
+            sportsman.FunClub = funClubDasha;
             sportsman.SportsCategory = SportsCategory.MasterOfSports;
             sportsman.Parametres.Age = 27;
             sportsman.Parametres.Height = 180;
             sportsman.Parametres.Weight = 70;
-            AddObject(sportsman);
+            ApplicationObjects.Add(sportsman);
+
+            Sport sportFootball = new Sport();
+            sportFootball.Name = "Футбол";
+            sportFootball.IsTeamOrIndividual = TeamOrIndividual.Team;
+            sportFootball.IsSummerOrWinter = SummerOrWinter.Summer;
+            sportFootball.IsOlimpicOrNonOlimpic = OlimpicOrNonOlimpic.Olimpic;
+            ApplicationObjects.Add(sportFootball);
+
+            FunClub funClubBarselona = new FunClub();
+            funClubBarselona.Name = "Фаны Барселоны";
+            funClubBarselona.NumberOfMembers = 10000;
+            funClubBarselona.Slogan = "Viva Barsa";
+            ApplicationObjects.Add(funClubBarselona);
 
             FootballTeam footballTeam1 = new FootballTeam();
             footballTeam1.Name = "Барселона";
             footballTeam1.Stadium = "Камп-Ноу";
             footballTeam1.Sponsor = "Viber";
+            //footballTeam1.FunClub = funClubBarselona;
             footballTeam1.Championat = Championat.LaLiga;
-            AddObject(footballTeam1);
+            ApplicationObjects.Add(footballTeam1);
 
             FootballTeam footballTeam2 = new FootballTeam();
             footballTeam2.Name = "Арсенал";
             footballTeam2.Stadium = "Эмирэйтс";
             footballTeam2.Sponsor = "Emirates";
             footballTeam2.Championat = Championat.EnglishPremierLeague;
-            AddObject(footballTeam2);
+            ApplicationObjects.Add(footballTeam2);
 
             FootballPlayer footballPlayer = new FootballPlayer();
             footballPlayer.FirstName = "Леонель";
             footballPlayer.LastName = "Месси";
             footballPlayer.SportsCategory = SportsCategory.MasterOfSports;
             footballPlayer.Position = Position.Forward;
+            footballPlayer.Sport = sportFootball;
             footballPlayer.FootballTeam = null;
             footballPlayer.Country = "Аргентина";
             footballPlayer.Parametres.Age = 31;
             footballPlayer.Parametres.Height = 176;
             footballPlayer.Parametres.Weight = 75;
-            AddObject(footballPlayer);
+            ApplicationObjects.Add(footballPlayer);
 
             FootballPlayer footballPlayer2 = new FootballPlayer();
             footballPlayer2.FirstName = "Серхио";
@@ -103,11 +120,12 @@ namespace WindowsFormsApp1
             footballPlayer2.SportsCategory = SportsCategory.MasterOfSports;
             footballPlayer2.Position = Position.Midfielder;
             footballPlayer2.FootballTeam = footballTeam1;
+            footballPlayer2.Sport = sportFootball;
             footballPlayer2.Country = "Испания";
             footballPlayer2.Parametres.Age = 33;
             footballPlayer2.Parametres.Height = 181;
             footballPlayer2.Parametres.Weight = 85;
-            AddObject(footballPlayer2);
+            ApplicationObjects.Add(footballPlayer2);
 
             FootballPlayer footballPlayer3 = new FootballPlayer();
             footballPlayer3.FirstName = "Виктор";
@@ -116,10 +134,11 @@ namespace WindowsFormsApp1
             footballPlayer3.Position = Position.GoalKeeper;
             footballPlayer3.FootballTeam = footballTeam1;
             footballPlayer3.Country = "Испания";
+            footballPlayer3.Sport = sportFootball;
             footballPlayer3.Parametres.Age = 40;
             footballPlayer3.Parametres.Height = 189;
             footballPlayer3.Parametres.Weight = 77;
-            AddObject(footballPlayer3);
+            ApplicationObjects.Add(footballPlayer3);
 
             FootballPlayer footballPlayer4 = new FootballPlayer();
             footballPlayer4.FirstName = "Александр";
@@ -128,22 +147,11 @@ namespace WindowsFormsApp1
             footballPlayer4.Position = Position.Midfielder;
             footballPlayer4.FootballTeam = footballTeam2;
             footballPlayer4.Country = "Беларусь";
+            footballPlayer4.Sport = sportFootball;
             footballPlayer4.Parametres.Age = 36;
             footballPlayer4.Parametres.Height = 178;
             footballPlayer4.Parametres.Weight = 72;
-            AddObject(footballPlayer4);
-
-            FootballPlayer footballPlayer5 = new FootballPlayer();
-            footballPlayer5.FirstName = "Тьерри";
-            footballPlayer5.LastName = "Анри";
-            footballPlayer5.SportsCategory = SportsCategory.MasterOfSports;
-            footballPlayer5.Position = Position.Forward;
-            footballPlayer5.FootballTeam = footballTeam2;
-            footballPlayer5.Country = "Франция";
-            footballPlayer5.Parametres.Age = 35;
-            footballPlayer5.Parametres.Height = 181;
-            footballPlayer5.Parametres.Weight = 81;
-            AddObject(footballPlayer5);
+            ApplicationObjects.Add(footballPlayer4);
         }
     }
 }
